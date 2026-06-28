@@ -2,7 +2,7 @@
 <html lang="pt-PT" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Lista de Compras Pro</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,6 +26,10 @@
         .view-hidden { display: none !important; }
         .pulse-warning { animation: pulseWarn 2s infinite; }
         @keyframes pulseWarn { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        
+        /* Ajustes de SafeArea para Mobile */
+        .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+        .select-hide-arrow { appearance: none; -moz-appearance: none; -webkit-appearance: none; }
     </style>
 </head>
 <body class="font-sans antialiased overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300">
@@ -33,20 +37,22 @@
     <div class="max-w-md mx-auto bg-white dark:bg-slate-900 h-screen relative shadow-2xl flex flex-col transition-colors duration-300">
         
         <!-- HEADER GLOBAL & GUARDIÃO DE ORÇAMENTO -->
-        <header class="bg-slate-900 dark:bg-slate-950 text-white p-5 rounded-b-3xl shadow-lg z-20 flex-shrink-0 relative overflow-hidden transition-colors duration-300">
+        <header class="bg-slate-900 dark:bg-slate-950 text-white p-5 rounded-b-3xl shadow-lg z-20 flex-shrink-0 relative overflow-hidden transition-colors duration-300 pt-[max(1.25rem,env(safe-area-inset-top))]">
             <div class="absolute top-0 right-0 w-40 h-40 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 pointer-events-none" id="header-glow"></div>
             
             <div class="flex justify-between items-center relative z-10 mb-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                        <i class="ph-fill ph-shopping-bag text-emerald-400 text-xl"></i>
+                <!-- Zona clicável para trocar utilizador -->
+                <div class="flex items-center gap-2 cursor-pointer hover:bg-white/5 p-1.5 -ml-1.5 rounded-xl transition" onclick="app.handlers.logout()">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 flex-shrink-0">
+                        <i class="ph-fill ph-user text-emerald-400 text-xl"></i>
                     </div>
-                    <div>
-                        <h1 class="text-lg font-bold tracking-wide text-white leading-tight">Jornada de Compras</h1>
-                        <p class="text-slate-400 dark:text-slate-500 text-xs font-medium" id="user-greeting">A carregar...</p>
+                    <div class="flex-1 min-w-0">
+                        <h1 class="text-lg font-bold tracking-wide text-white leading-tight truncate">Jornada de Compras</h1>
+                        <p class="text-slate-400 dark:text-slate-500 text-xs font-medium flex items-center gap-1 truncate" id="user-greeting">A carregar... <i class="ph-bold ph-caret-down text-[10px]"></i></p>
                     </div>
                 </div>
-                <div class="flex gap-2">
+                
+                <div class="flex gap-2 flex-shrink-0">
                     <button onclick="app.ui.toggleTheme()" id="btn-theme" class="p-2 bg-slate-800 dark:bg-slate-800 rounded-full hover:bg-slate-700 transition"><i class="ph ph-moon text-xl text-amber-300" id="icon-theme"></i></button>
                     <button id="header-btn-limpar" onclick="app.ui.modals.limpar.open()" class="p-2 bg-slate-800 rounded-full hover:bg-slate-700 transition"><i class="ph ph-trash text-xl text-red-400"></i></button>
                 </div>
@@ -54,7 +60,6 @@
 
             <!-- Dashboard de Sessão -->
             <div id="mercado-dashboard" class="relative z-10">
-                
                 <!-- Estado: Sem Sessão Ativa -->
                 <div id="ui-sessao-inativa" class="flex flex-col items-center justify-center py-2">
                     <button onclick="app.handlers.iniciarComprasDialog()" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-xl hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 flex justify-center items-center gap-2 transition-transform active:scale-95">
@@ -62,15 +67,15 @@
                     </button>
                 </div>
 
-                <!-- Estado: Sessão Ativa (Múltiplos Mercados & Orçamento) -->
+                <!-- Estado: Sessão Ativa -->
                 <div id="ui-sessao-ativa" class="hidden">
                     <div class="flex justify-between items-end mb-2">
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <p class="text-slate-400 text-[10px] uppercase tracking-wider font-bold mb-0.5 flex items-center gap-1"><i class="ph-fill ph-map-pin"></i> Mercado Atual</p>
                             <h3 class="text-sm font-bold text-emerald-300 truncate pr-2 leading-none" id="display-mercado-atual">--</h3>
                             <p class="text-2xl font-black text-white mt-1 leading-none" id="subtotal-mercado-display">R$ 0,00</p>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right flex-shrink-0">
                             <p class="text-slate-400 text-[10px] uppercase tracking-wider font-bold mb-0.5">Total da Viagem</p>
                             <p class="text-lg font-bold text-slate-200 leading-none" id="subtotal-global-display">R$ 0,00</p>
                         </div>
@@ -98,7 +103,6 @@
                         </button>
                     </div>
                 </div>
-
             </div>
         </header>
 
@@ -108,19 +112,23 @@
             <!-- VIEW 1: MERCADO -->
             <div id="view-mercado" class="h-full flex flex-col">
                 <div class="p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex-shrink-0 z-10 shadow-sm rounded-b-2xl transition-colors duration-300">
-                    <form id="form-add-item" class="flex gap-2 mb-2">
+                    <!-- Layout do Formulário Corrigido -->
+                    <form id="form-add-item" class="flex gap-2 mb-2 w-full">
                         <input type="text" id="item-name" placeholder="Adicionar artigo..." required
-                            class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none">
-                        <select id="item-category" class="px-2 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none w-24">
+                            class="min-w-0 flex-1 px-3 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+                        
+                        <select id="item-category" class="flex-shrink-0 px-2 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none w-[70px] text-sm text-center select-hide-arrow font-semibold cursor-pointer">
                             <option value="" disabled selected>Cat.</option>
                         </select>
-                        <button type="submit" id="btn-add-item" class="bg-emerald-600 text-white px-4 py-3 rounded-xl hover:bg-emerald-700 shadow-md flex items-center justify-center min-w-[56px]"><i class="ph ph-plus text-xl font-bold"></i></button>
+                        
+                        <button type="submit" id="btn-add-item" class="flex-shrink-0 w-[50px] bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-md flex items-center justify-center transition-transform active:scale-95"><i class="ph ph-plus text-xl font-bold"></i></button>
                     </form>
                     <div class="flex justify-between items-center px-1">
                         <span id="progress-text" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">0/0 Artigos</span>
                         <button type="button" onclick="app.ui.modals.categorias.open()" class="text-sm text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1"><i class="ph ph-gear"></i> Categorias</button>
                     </div>
                 </div>
+                <!-- Lista -->
                 <div class="flex-1 overflow-y-auto p-4 pb-24 hide-scrollbar relative" id="lista-container"></div>
             </div>
 
@@ -131,7 +139,7 @@
                     <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Guarde a lista atual para compras futuras (Ex: Compra Mensal).</p>
                     <div class="flex gap-2">
                         <input type="text" id="input-nome-lista" placeholder="Nome do Molde..." class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white outline-none">
-                        <button onclick="app.handlers.salvarListaTemplate()" class="bg-slate-900 dark:bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold shadow-md">Guardar</button>
+                        <button onclick="app.handlers.salvarListaTemplate()" class="bg-slate-900 dark:bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold shadow-md flex-shrink-0">Guardar</button>
                     </div>
                 </div>
                 <div class="px-4 pb-2"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Os Meus Moldes</h3></div>
@@ -146,8 +154,8 @@
             
         </main>
 
-        <!-- BOTTOM NAV -->
-        <nav class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-2 flex justify-around items-center absolute bottom-0 w-full z-20 pb-4 transition-colors duration-300">
+        <!-- BOTTOM NAV COM SAFE AREA -->
+        <nav class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-2 pb-safe px-2 flex justify-around items-center absolute bottom-0 w-full z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-300">
             <button onclick="app.ui.switchTab('mercado')" class="flex flex-col items-center p-2 tab-btn tab-active" data-tab="mercado"><i class="ph-fill ph-shopping-cart text-2xl mb-1"></i><span class="text-[10px] font-bold uppercase">Mercado</span></button>
             <button onclick="app.ui.switchTab('listas')" class="flex flex-col items-center p-2 tab-btn tab-inactive" data-tab="listas"><i class="ph ph-bookmark-simple text-2xl mb-1"></i><span class="text-[10px] font-bold uppercase">Listas</span></button>
             <button onclick="app.ui.switchTab('historico')" class="flex flex-col items-center p-2 tab-btn tab-inactive" data-tab="historico"><i class="ph ph-clock-counter-clockwise text-2xl mb-1"></i><span class="text-[10px] font-bold uppercase">Histórico</span></button>
@@ -160,7 +168,7 @@
 
     <!-- ================= MODAIS ================= -->
     
-    <!-- Modal APENAS Nome (Para quem chega depois) -->
+    <!-- Modal Identificação -->
     <div id="modal-nome" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl transition-colors duration-300">
             <div class="text-center mb-6">
@@ -168,33 +176,31 @@
                 <h3 class="text-2xl font-bold text-slate-800 dark:text-white">Quem é você?</h3>
                 <p class="text-slate-500 dark:text-slate-400 text-sm mt-2">Diga-nos o seu nome para sabermos quem marcou o quê.</p>
             </div>
-            <input type="text" id="input-username-only" placeholder="O seu nome (Ex: Estela)" class="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent dark:text-white font-bold outline-none focus:border-emerald-500 text-center mb-4 text-xl">
+            <input type="text" id="input-username-only" placeholder="O seu nome (Ex: Estela)" class="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 dark:text-white font-bold outline-none focus:border-emerald-500 text-center mb-4 text-xl">
             <button onclick="app.handlers.salvarNome()" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-md hover:bg-emerald-700 text-lg">Entrar</button>
         </div>
     </div>
 
-    <!-- Modal Iniciar Viagem (Mercado, Orçamento) - Para quem clica em Iniciar -->
+    <!-- Modal Iniciar Viagem -->
     <div id="modal-iniciar" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl transition-colors duration-300">
             <div class="text-center mb-6">
                 <div class="bg-emerald-100 dark:bg-emerald-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-emerald-600 dark:text-emerald-400 shadow-inner"><i class="ph-fill ph-rocket-launch text-3xl"></i></div>
                 <h3 class="text-2xl font-bold text-slate-800 dark:text-white">Preparar Viagem</h3>
             </div>
-            
             <div class="space-y-4 mb-6">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Primeiro Mercado</label>
-                    <input type="text" id="input-primeiro-mercado" placeholder="Ex: Continente" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white font-bold outline-none focus:border-emerald-500">
+                    <input type="text" id="input-primeiro-mercado" placeholder="Ex: Continente" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 dark:text-white font-bold outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Orçamento Máximo (Opcional)</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">R$</span>
-                        <input type="number" id="input-orcamento" placeholder="0.00" step="0.01" class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white font-bold outline-none focus:border-emerald-500">
+                        <input type="number" id="input-orcamento" placeholder="0.00" step="0.01" class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 dark:text-white font-bold outline-none focus:border-emerald-500">
                     </div>
                 </div>
             </div>
-            
             <div class="flex gap-3">
                 <button onclick="app.ui.modals.iniciar.close()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-4 rounded-xl font-bold">Cancelar</button>
                 <button onclick="app.handlers.iniciarSessao()" class="flex-1 bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-md hover:bg-emerald-700">Iniciar</button>
@@ -208,7 +214,7 @@
             <div class="bg-blue-100 dark:bg-blue-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400"><i class="ph-fill ph-storefront text-3xl"></i></div>
             <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Mudar de Mercado</h3>
             <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Os artigos marcados até agora ficam registados no mercado atual. Qual é o próximo destino?</p>
-            <input type="text" id="input-novo-mercado" placeholder="Nome do novo mercado..." class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent dark:text-white font-bold outline-none focus:border-blue-500 mb-6 text-center">
+            <input type="text" id="input-novo-mercado" placeholder="Nome do novo mercado..." class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 dark:text-white font-bold outline-none focus:border-blue-500 mb-6 text-center">
             <div class="flex gap-3">
                 <button onclick="app.ui.modals.mudarMercado.close()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-3 rounded-xl font-bold">Cancelar</button>
                 <button onclick="app.handlers.executarMudancaMercado()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold shadow-md">Confirmar Troca</button>
@@ -227,12 +233,16 @@
                 <button onclick="app.handlers.abrirRelatorioNovo()" class="w-full bg-slate-900 dark:bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition hover:bg-slate-800">
                     <i class="ph-fill ph-flag-checkered text-xl"></i> Encerrar Jornada (Relatório)
                 </button>
-                <button onclick="app.ui.modals.acoesJornada.close()" class="w-full text-slate-400 py-2 font-bold mt-2">Continuar a Comprar Aqui</button>
+                <!-- NOVA OPÇÃO: Abortar Viagem -->
+                <button onclick="app.handlers.abortarViagemDialog()" class="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition hover:bg-red-100 mt-2">
+                    <i class="ph-fill ph-x-circle text-xl"></i> Cancelar Viagem (Sem Salvar)
+                </button>
+                <button onclick="app.ui.modals.acoesJornada.close()" class="w-full text-slate-500 dark:text-slate-400 py-2 font-bold mt-1">Continuar a Comprar Aqui</button>
             </div>
         </div>
     </div>
     
-    <!-- MODAL DE PREÇO E QUANTIDADE -->
+    <!-- MODAL DE PREÇO -->
     <div id="modal-preco" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl transition-colors duration-300">
             <div class="flex justify-between items-center mb-4">
@@ -268,12 +278,14 @@
         </div>
     </div>
     
-    <div id="modal-categorias" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-slate-800 dark:text-white">Categorias</h3><button onclick="app.ui.modals.categorias.close()" class="text-slate-400 hover:text-slate-600 bg-slate-100 dark:bg-slate-700 rounded-full p-1"><i class="ph ph-x text-xl"></i></button></div><div class="flex gap-2 mb-4"><input type="text" id="nova-categoria-nome" placeholder="Nova" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white"><button onclick="app.handlers.addCategoria()" class="bg-slate-800 dark:bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold"><i class="ph ph-plus text-lg"></i></button></div><div class="overflow-y-auto flex-1 hide-scrollbar bg-slate-50 dark:bg-slate-900 rounded-xl p-2"><ul id="lista-categorias-gerenciar" class="space-y-2"></ul></div></div></div>
+    <!-- (Outros Modais Simplificados) -->
+    <div id="modal-categorias" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-slate-800 dark:text-white">Categorias</h3><button onclick="app.ui.modals.categorias.close()" class="text-slate-400 hover:text-slate-600 bg-slate-100 dark:bg-slate-700 rounded-full p-1"><i class="ph ph-x text-xl"></i></button></div><div class="flex gap-2 mb-4"><input type="text" id="nova-categoria-nome" placeholder="Nova" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 dark:text-white"><button onclick="app.handlers.addCategoria()" class="bg-slate-800 dark:bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold"><i class="ph ph-plus text-lg"></i></button></div><div class="overflow-y-auto flex-1 hide-scrollbar bg-slate-50 dark:bg-slate-900 rounded-xl p-2"><ul id="lista-categorias-gerenciar" class="space-y-2"></ul></div></div></div>
     <div id="modal-limpar-opcoes" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><div class="bg-red-50 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500"><i class="ph ph-trash text-3xl"></i></div><h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Limpar Mercado</h3><div class="flex flex-col gap-3 mt-4"><button onclick="app.handlers.acaoLimparLista('desmarcar')" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-xl font-bold">Apenas Desmarcar</button><button onclick="app.handlers.acaoLimparLista('apagar')" class="w-full bg-red-500 text-white py-3 rounded-xl font-bold">Apagar Toda a Lista</button><button onclick="app.ui.modals.limpar.close()" class="w-full text-slate-400 py-2 font-bold mt-2">Cancelar</button></div></div></div>
     <div id="modal-load-template" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Carregar <span id="load-template-name" class="text-emerald-500"></span></h3><div class="flex flex-col gap-3 mt-6"><button onclick="app.handlers.executarLoadTemplate('substituir')" class="w-full bg-slate-900 dark:bg-emerald-600 text-white py-3 rounded-xl font-bold">Substituir Atual</button><button onclick="app.handlers.executarLoadTemplate('adicionar')" class="w-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 py-3 rounded-xl font-bold border border-emerald-200 dark:border-emerald-800">Apenas Adicionar Itens</button><button onclick="app.ui.modals.loadTemplate.close()" class="w-full text-slate-400 py-2 font-bold mt-2">Cancelar</button></div></div></div>
     <div id="modal-confirmacao" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><div id="confirm-icon-bg" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i id="confirm-icon" class="text-3xl"></i></div><h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" id="confirm-title">Aviso</h3><p class="text-slate-600 dark:text-slate-400 text-sm mb-6" id="confirm-desc">Tem a certeza?</p><div class="flex gap-3"><button onclick="app.ui.modals.confirm.close()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-3 rounded-xl font-bold">Cancelar</button><button id="btn-confirm-action" class="flex-1 text-white py-3 rounded-xl font-bold shadow-md">Confirmar</button></div></div></div>
 
-    <div id="modal-relatorio" class="fixed inset-0 bg-slate-900 z-[70] hidden flex flex-col p-4 overflow-y-auto">
+    <!-- RELATÓRIO FINAL / RECIBO -->
+    <div id="modal-relatorio" class="fixed inset-0 bg-slate-900 z-[70] hidden flex flex-col p-4 overflow-y-auto pb-safe">
         <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md mx-auto shadow-2xl my-auto relative overflow-hidden flex flex-col max-h-[90vh]">
             <i class="ph-fill ph-receipt text-[150px] text-slate-50 dark:text-slate-800/30 absolute -right-10 -bottom-10 pointer-events-none"></i>
             <div class="relative z-10 flex flex-col h-full overflow-hidden">
@@ -302,6 +314,7 @@
         </div>
     </div>
 
+    <!-- CORE SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, setDoc, deleteDoc, writeBatch, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -323,18 +336,14 @@
                 formataMoeda: (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0),
                 formatTime: (ms) => { const ts = Math.floor(ms / 1000); const h = Math.floor(ts / 3600); const m = Math.floor((ts % 3600) / 60); const s = ts % 60; return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}` : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; },
                 formatDate: (ms) => { const d = new Date(ms); return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} às ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; },
-                showToast: (msg, type = 'success') => { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `toast-enter flex items-center gap-3 p-4 rounded-2xl shadow-xl border ${type === 'error' ? 'bg-red-50 dark:bg-red-900 border-red-100 dark:border-red-800 text-red-700 dark:text-red-200' : 'bg-slate-900 dark:bg-emerald-800 border-slate-800 dark:border-emerald-700 text-white'}`; t.innerHTML = `<i class="ph ${type === 'error' ? 'ph-warning-circle text-red-500' : 'ph-check-circle text-emerald-400'} text-2xl"></i><span class="font-medium text-sm">${msg}</span>`; c.appendChild(t); setTimeout(() => { t.classList.replace('toast-enter', 'toast-exit'); setTimeout(() => t.remove(), 300); }, 3000); }
+                showToast: (msg, type = 'success') => { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `toast-enter flex items-center gap-3 p-4 rounded-2xl shadow-xl border ${type === 'error' ? 'bg-red-50 dark:bg-red-900/80 border-red-100 dark:border-red-800 text-red-700 dark:text-red-200' : 'bg-slate-900 dark:bg-emerald-800 border-slate-800 dark:border-emerald-700 text-white'}`; t.innerHTML = `<i class="ph ${type === 'error' ? 'ph-warning-circle text-red-500' : 'ph-check-circle text-emerald-400'} text-2xl"></i><span class="font-medium text-sm">${msg}</span>`; c.appendChild(t); setTimeout(() => { t.classList.replace('toast-enter', 'toast-exit'); setTimeout(() => t.remove(), 300); }, 3000); }
             },
             ui: {
                 init: () => { 
                     if(app.state.isDark) document.documentElement.classList.add('dark');
                     app.ui.renderThemeIcon();
-                    // Se não tiver nome, abre o modal de nome (NÃO o de iniciar viagem)
-                    if (!app.state.currentUser) { 
-                        app.ui.modals.nome.open(); 
-                    } else { 
-                        document.getElementById('user-greeting').innerText = `Olá, ${app.state.currentUser}!`; 
-                    }
+                    if (!app.state.currentUser) { app.ui.modals.nome.open(); } 
+                    else { document.getElementById('user-greeting').innerHTML = `Olá, ${app.state.currentUser}! <i class="ph-bold ph-caret-down text-[10px]"></i>`; }
                 },
                 toggleTheme: () => { const isDark = document.documentElement.classList.toggle('dark'); app.state.isDark = isDark; localStorage.setItem('mercado_theme', isDark ? 'dark' : 'light'); app.ui.renderThemeIcon(); },
                 renderThemeIcon: () => { const i = document.getElementById('icon-theme'); if(app.state.isDark) { i.className = "ph-fill ph-sun text-xl text-amber-300"; } else { i.className = "ph-fill ph-moon text-xl text-indigo-300"; } },
@@ -347,7 +356,7 @@
                 },
                 updateTimerUI: () => { if(app.state.session.ativa) document.getElementById('timer-display').innerText = app.utils.formatTime(Date.now() - app.state.session.inicio); },
                 modals: {
-                    nome: { open: () => document.getElementById('modal-nome').classList.remove('hidden'), close: () => document.getElementById('modal-nome').classList.add('hidden') },
+                    nome: { open: () => { document.getElementById('input-username-only').value = app.state.currentUser || ''; document.getElementById('modal-nome').classList.remove('hidden'); }, close: () => document.getElementById('modal-nome').classList.add('hidden') },
                     iniciar: { open: () => document.getElementById('modal-iniciar').classList.remove('hidden'), close: () => document.getElementById('modal-iniciar').classList.add('hidden') },
                     mudarMercado: { open: () => { document.getElementById('input-novo-mercado').value=''; document.getElementById('modal-acoes-jornada').classList.add('hidden'); document.getElementById('modal-mudar-mercado').classList.remove('hidden'); setTimeout(()=>document.getElementById('input-novo-mercado').focus(),100); }, close: () => document.getElementById('modal-mudar-mercado').classList.add('hidden') },
                     acoesJornada: { open: () => document.getElementById('modal-acoes-jornada').classList.remove('hidden'), close: () => document.getElementById('modal-acoes-jornada').classList.add('hidden') },
@@ -408,16 +417,16 @@
                         its.forEach(i => {
                             const isCurrentMarket = i.mercadoComprado === mercadoAtivo;
                             const isPastMarket = i.comprado && !isCurrentMarket;
-                            const qTx = (i.quantidade && i.quantidade > 1) ? `${i.quantidade}x ` : '';
-                            const marketTag = isPastMarket ? `<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] px-1.5 py-0.5 rounded uppercase font-bold flex items-center gap-0.5"><i class="ph-fill ph-storefront"></i> ${i.mercadoComprado}</span>` : '';
+                            const qTx = (i.quantidade && i.quantidade > 1) ? `<span class="text-emerald-500 mr-1">${i.quantidade}x</span>` : '';
+                            const marketTag = isPastMarket ? `<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] px-1.5 py-0.5 rounded uppercase font-bold flex items-center gap-0.5 mt-1 sm:mt-0"><i class="ph-fill ph-storefront"></i> ${i.mercadoComprado}</span>` : '';
 
-                            h += `<li class="flex items-center gap-3 p-4 rounded-2xl border ${i.comprado?"bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 opacity-80":"bg-white dark:bg-slate-800 border-white dark:border-slate-700 shadow-md"} transition-all">
+                            h += `<li class="flex items-center gap-2 p-3 rounded-2xl border ${i.comprado?"bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 opacity-80":"bg-white dark:bg-slate-800 border-white dark:border-slate-700 shadow-md"} transition-all">
                                 <button onclick="app.handlers.toggleItem('${i.id}', ${i.comprado})" class="flex-shrink-0 focus:outline-none rounded-full active:scale-90">${i.comprado?'<i class="ph-fill ph-check-circle text-3xl text-emerald-500"></i>':'<i class="ph ph-circle text-3xl text-slate-300 dark:text-slate-600"></i>'}</button>
                                 <div class="flex-1 overflow-hidden cursor-pointer" onclick="${i.comprado?`app.ui.modals.preco.open('${i.id}',true,${i.precoUnitario||i.preco},${i.quantidade||1})`:`app.handlers.toggleItem('${i.id}',false)`}">
                                     <p class="truncate ${i.comprado?"line-through text-slate-400":"text-slate-800 dark:text-slate-100 font-bold"} text-lg tracking-tight flex items-center gap-2">${i.nome}</p>
                                     ${i.comprado?`<div class="flex flex-wrap gap-2 items-center mt-1"><span class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs px-2 py-1 rounded-lg font-bold">${qTx}${app.utils.formataMoeda(i.preco)}</span>${marketTag}${i.quemPegou?`<span class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 text-xs px-2 py-1 rounded-lg flex items-center gap-1 font-medium"><i class="ph-fill ph-user"></i> ${i.quemPegou}</span>`:''}</div>`:''}
                                 </div>
-                                <button onclick="app.handlers.excluirItemDialog('${i.id}','${i.nome.replace(/'/g,"\\'")}')" class="text-slate-300 dark:text-slate-500 hover:text-red-500 p-2"><i class="ph ph-x font-bold"></i></button>
+                                <button onclick="app.handlers.excluirItemDialog('${i.id}','${i.nome.replace(/'/g,"\\'")}')" class="text-slate-300 dark:text-slate-500 hover:text-red-500 p-1.5"><i class="ph ph-x font-bold text-lg"></i></button>
                             </li>`;
                         }); h += `</ul></div>`;
                     }
@@ -431,32 +440,31 @@
                 renderHistorico: () => {
                     const c = document.getElementById('container-historico'); let h = '';
                     if(app.state.historico.length === 0) { c.innerHTML = '<p class="text-sm text-slate-400 text-center mt-10">Nenhum registo.</p>'; return; }
-                    app.state.historico.forEach(r => { h += `<div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-3 flex flex-col gap-3 cursor-pointer hover:border-emerald-300 transition" onclick="app.handlers.abrirRelatorioHistorico('${r.id}')"><div class="flex justify-between items-center"><div class="flex items-center gap-2"><i class="ph-fill ph-calendar-check text-emerald-500 text-xl"></i><div><p class="font-bold text-slate-700 dark:text-slate-200 text-sm">${app.utils.formatDate(r.data)}</p><p class="text-xs text-slate-400">Locais: ${r.mercadosVisitados ? r.mercadosVisitados.length : 1}</p></div></div><span class="font-black text-emerald-700 dark:text-emerald-400">${app.utils.formataMoeda(r.total)}</span></div><div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-2 flex justify-between items-center text-xs text-slate-500 dark:text-slate-400"><span>${r.itens.length} artigos comprados</span><span class="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">Detalhes <i class="ph ph-caret-right"></i></span></div></div>`; }); c.innerHTML = h;
+                    app.state.historico.forEach(r => { h += `<div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-3 flex flex-col gap-3 hover:border-emerald-300 transition" onclick="app.handlers.abrirRelatorioHistorico('${r.id}')"><div class="flex justify-between items-center"><div class="flex items-center gap-2"><i class="ph-fill ph-calendar-check text-emerald-500 text-xl"></i><div><p class="font-bold text-slate-700 dark:text-slate-200 text-sm">${app.utils.formatDate(r.data)}</p><p class="text-xs text-slate-400">Locais: ${r.mercadosVisitados ? r.mercadosVisitados.length : 1}</p></div></div><div class="flex items-center gap-3"><span class="font-black text-emerald-700 dark:text-emerald-400">${app.utils.formataMoeda(r.total)}</span><button onclick="event.stopPropagation(); app.handlers.deleteHistorico('${r.id}')" class="text-slate-300 hover:text-red-500 p-1"><i class="ph ph-trash text-lg"></i></button></div></div><div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-2 flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 cursor-pointer"><span>${r.itens.length} artigos comprados</span><span class="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">Detalhes <i class="ph ph-caret-right"></i></span></div></div>`; }); c.innerHTML = h;
                 }
             },
             handlers: {
-                // APENAS PARA QUEM ENTRA DE NOVO
+                logout: () => {
+                    app.ui.modals.confirm.open("Trocar de Perfil?", "Deseja sair para se identificar com outro nome?", "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400", "bg-blue-600", "ph-user-switch", () => {
+                        localStorage.removeItem('mercado_username'); app.state.currentUser = null;
+                        document.getElementById('user-greeting').innerHTML = 'A carregar... <i class="ph-bold ph-caret-down text-[10px]"></i>';
+                        app.ui.modals.nome.open();
+                    });
+                },
                 salvarNome: () => { 
                     const n = document.getElementById('input-username-only').value.trim(); 
                     if(!n) return app.utils.showToast("Por favor, diga o seu nome.", "error"); 
-                    localStorage.setItem('mercado_username', n); 
-                    app.state.currentUser = n; 
-                    app.ui.modals.nome.close(); 
-                    document.getElementById('user-greeting').innerText = `Olá, ${n}!`; 
+                    localStorage.setItem('mercado_username', n); app.state.currentUser = n; 
+                    app.ui.modals.nome.close(); document.getElementById('user-greeting').innerHTML = `Olá, ${n}! <i class="ph-bold ph-caret-down text-[10px]"></i>`; 
                     app.utils.showToast(`Bem-vindo(a), ${n}!`);
                 },
                 
-                // PARA INICIAR A VIAGEM GLOBAL
                 iniciarComprasDialog: () => app.ui.modals.iniciar.open(),
                 iniciarSessao: async () => { 
                     const mercado = document.getElementById('input-primeiro-mercado').value.trim() || "Mercado Principal";
                     const orcInput = parseFloat(document.getElementById('input-orcamento').value.replace(',','.'));
                     const orcamento = !isNaN(orcInput) && orcInput > 0 ? orcInput : 0;
-                    try { 
-                        await setDoc(sessaoRef, {ativa:true, inicio:Date.now(), mercadoAtual: mercado, mercadosVisitados: [mercado], orcamento: orcamento}); 
-                        app.ui.modals.iniciar.close();
-                        app.utils.showToast("Boa Viagem de Compras!"); 
-                    }catch(e){ app.utils.showToast("Erro de ligação.", "error");} 
+                    try { await setDoc(sessaoRef, {ativa:true, inicio:Date.now(), mercadoAtual: mercado, mercadosVisitados: [mercado], orcamento: orcamento}); app.ui.modals.iniciar.close(); app.utils.showToast("Boa Viagem de Compras!"); }catch(e){ app.utils.showToast("Erro de ligação.", "error");} 
                 },
                 executarMudancaMercado: async () => {
                     const novo = document.getElementById('input-novo-mercado').value.trim();
@@ -468,6 +476,17 @@
                         app.ui.modals.mudarMercado.close();
                         app.utils.showToast(`Chegámos ao ${novo}!`);
                     } catch(e) {}
+                },
+                abortarViagemDialog: () => {
+                    app.ui.modals.confirm.open('Cancelar Viagem?', 'A viagem atual será cancelada e não será guardada no histórico.', 'bg-red-100 dark:bg-red-900/30 text-red-500', 'bg-red-500', 'ph-warning', app.handlers.abortarViagemExecutar);
+                },
+                abortarViagemExecutar: async () => {
+                    try {
+                        if(app.state.session.ativa) await setDoc(sessaoRef, {ativa:false,inicio:null, mercadoAtual:"", mercadosVisitados:[], orcamento:0});
+                        const batch = writeBatch(db); app.state.items.filter(i=>i.comprado).forEach(i => batch.update(doc(db,"produtos",i.id), {comprado:false, preco:0, precoUnitario:0, quantidade:1, quemPegou:null, mercadoComprado:null})); await batch.commit();
+                        app.ui.modals.acoesJornada.close();
+                        app.utils.showToast("Viagem cancelada e carrinho esvaziado.");
+                    } catch(e) { app.utils.showToast("Erro ao cancelar.", "error"); }
                 },
                 
                 mudarQtd: (delta) => { const i = document.getElementById('input-qtd'); let v = parseInt(i.value) + delta; if(v < 1) v = 1; i.value = v; app.handlers.calcularTotalPrecoUI(); },
@@ -490,15 +509,12 @@
                 },
 
                 abrirRelatorioNovo: () => {
-                    app.ui.modals.acoesJornada.close();
-                    let sub = 0; const comps = app.state.items.filter(i => i.comprado);
-                    comps.forEach(i => { sub += i.preco; });
+                    app.ui.modals.acoesJornada.close(); let sub = 0; const comps = app.state.items.filter(i => i.comprado); comps.forEach(i => { sub += i.preco; });
                     app.handlers.preencherModalRelatorio("Relatório Final", Date.now(), sub, document.getElementById('timer-display').innerText || "00:00", comps, true, app.state.session.mercadosVisitados);
                 },
 
                 salvarHistoricoEFechar: async (esvaziar) => {
-                    let sub = 0; const comps = app.state.items.filter(i => i.comprado);
-                    comps.forEach(i => { sub += i.preco; });
+                    let sub = 0; const comps = app.state.items.filter(i => i.comprado); comps.forEach(i => { sub += i.preco; });
                     try {
                         if(comps.length > 0) await addDoc(historicoRef, { data: Date.now(), total: sub, tempo: document.getElementById('timer-display').innerText || "00:00", itens: comps, mercadosVisitados: app.state.session.mercadosVisitados || [] });
                         if(app.state.session.ativa) await setDoc(sessaoRef, {ativa:false,inicio:null, mercadoAtual:"", mercadosVisitados:[], orcamento:0});
@@ -520,19 +536,17 @@
                     const contM = document.getElementById('rel-mercados-container'); contM.innerHTML = '';
                     for(const [mNome, mDados] of Object.entries(mkts)) {
                         let htmlLista = '';
-                        mDados.lista.forEach(i => {
-                            const qTx = (i.quantidade && i.quantidade>1) ? `<span class="text-emerald-500 mr-1">${i.quantidade}x</span>` : '';
-                            htmlLista += `<li class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"><div><p class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate w-40">${qTx}${i.nome}</p><p class="text-[10px] text-slate-400">${i.quemPegou || 'Anónimo'}</p></div><span class="font-bold text-slate-800 dark:text-white text-sm">${app.utils.formataMoeda(i.preco)}</span></li>`;
-                        });
+                        mDados.lista.forEach(i => { const qTx = (i.quantidade && i.quantidade>1) ? `<span class="text-emerald-500 mr-1">${i.quantidade}x</span>` : ''; htmlLista += `<li class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"><div><p class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate w-40">${qTx}${i.nome}</p><p class="text-[10px] text-slate-400">${i.quemPegou || 'Anónimo'}</p></div><span class="font-bold text-slate-800 dark:text-white text-sm">${app.utils.formataMoeda(i.preco)}</span></li>`; });
                         contM.innerHTML += `<div class="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden"><div class="bg-slate-200 dark:bg-slate-900 px-3 py-2 flex justify-between items-center"><h5 class="font-bold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-1"><i class="ph-fill ph-storefront text-blue-500"></i> ${mNome}</h5><span class="font-black text-sm text-slate-800 dark:text-white">${app.utils.formataMoeda(mDados.total)}</span></div><ul class="px-3">${htmlLista}</ul></div>`;
                     }
 
                     const bDiv = document.getElementById('rel-botoes-container');
-                    if(isNovo) { bDiv.innerHTML = `<button onclick="app.handlers.salvarHistoricoEFechar(false)" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white py-3 rounded-xl font-bold border border-slate-200 dark:border-slate-700">Apenas Salvar no Histórico</button><button onclick="app.handlers.salvarHistoricoEFechar(true)" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold shadow-md">Salvar e Limpar Carrinho</button>`; } 
+                    if(isNovo) { bDiv.innerHTML = `<button onclick="app.handlers.salvarHistoricoEFechar(false)" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white py-3 rounded-xl font-bold border border-slate-200 dark:border-slate-700">Apenas Salvar no Histórico</button><button onclick="app.handlers.salvarHistoricoEFechar(true)" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold shadow-md">Salvar e Apagar Lista</button>`; } 
                     else { bDiv.innerHTML = `<button onclick="app.ui.modals.relatorio.close()" class="w-full bg-slate-900 dark:bg-slate-700 text-white py-4 rounded-xl font-bold">Fechar Detalhes</button>`; }
                     app.ui.modals.relatorio.open();
                 },
                 abrirRelatorioHistorico: (id) => { const r = app.state.historico.find(x => x.id === id); if(!r) return; app.handlers.preencherModalRelatorio("Recibo Antigo", r.data, r.total, r.tempo, r.itens, false, r.mercadosVisitados); },
+                deleteHistorico: (id) => { app.ui.modals.confirm.open("Apagar Recibo?", "Deseja apagar permanentemente este registo do Histórico?", "bg-red-100 text-red-600", "bg-red-500", "ph-trash", async () => { try { await deleteDoc(doc(db, "historico_compras", id)); app.utils.showToast("Recibo apagado."); } catch(e){} }); },
 
                 salvarListaTemplate: async () => { const n = document.getElementById('input-nome-lista').value.trim(); if(!n) return app.utils.showToast("Dê um nome ao molde", "error"); if(app.state.items.length === 0) return app.utils.showToast("Carrinho vazio", "error"); const it = app.state.items.map(i => ({ nome: i.nome, categoria: i.categoria })); try { await addDoc(listasSalvasRef, { nome: n, itens: it, timestamp: Date.now() }); document.getElementById('input-nome-lista').value = ''; app.utils.showToast("Molde salvo!"); } catch(e) {} },
                 executarLoadTemplate: async (modo) => { const t = app.state.listasSalvas.find(l => l.id === app.state.templateLoadingId); if(!t) return; try { const batch = writeBatch(db); if (modo === 'substituir') app.state.items.forEach(i => batch.delete(doc(db, "produtos", i.id))); t.itens.forEach(i => { batch.set(doc(collection(db, "produtos")), { nome: i.nome, categoria: i.categoria, comprado: false, preco: 0, precoUnitario: 0, quantidade: 1, quemPegou: null, mercadoComprado: null }); }); await batch.commit(); app.utils.showToast("Molde carregado!"); app.ui.modals.loadTemplate.close(); app.ui.switchTab('mercado'); } catch(e) {} },
@@ -541,7 +555,7 @@
                 addItem: async (e) => { e.preventDefault(); const n = document.getElementById('item-name').value.trim(); const c = document.getElementById('item-category').value; if(!n||!c)return; try{await addDoc(itemsRef,{nome:n,categoria:c,comprado:false,preco:0,quemPegou:null,mercadoComprado:null}); document.getElementById('item-name').value='';}catch(e){} },
                 toggleItem: async (id, isC) => { if(isC)try{await updateDoc(doc(db,"produtos",id),{comprado:false,preco:0,precoUnitario:0,quantidade:1,quemPegou:null,mercadoComprado:null});}catch(e){} else app.ui.modals.preco.open(id,false); },
                 excluirItemDialog: (id, nome) => { app.ui.modals.confirm.open("Apagar Artigo?", `Remover ${nome}?`, "bg-red-100 dark:bg-red-900/50 text-red-500", "bg-red-500", "ph-trash", async () => { await deleteDoc(doc(db, "produtos", id)); }); },
-                addCategoria: async () => { const n = document.getElementById('nova-categoria-nome').value.trim(); if(!n)return; try{await addDoc(categoriesRef,{nome:n});}catch(e){} },
+                addCategoria: async () => { const n = document.getElementById('nova-categoria-nome').value.trim(); if(!n)return; try{await addDoc(categoriesRef,{nome:n}); document.getElementById('nova-categoria-nome').value='';}catch(e){} },
             }
         };
 
@@ -564,7 +578,7 @@
                     boxInativa.classList.remove('hidden'); boxAtiva.classList.add('hidden'); 
                     if(app.state.timerInterval)clearInterval(app.state.timerInterval); document.getElementById('timer-display').innerText="00:00"; app.state.popupFimMostrado=false; 
                 }
-                app.ui.renderItems(); // Re-render to update market subtotal
+                app.ui.renderItems();
             } else setDoc(sessaoRef, {ativa:false,inicio:null, mercadoAtual:"", mercadosVisitados:[], orcamento:0});
         });
         
@@ -572,3 +586,6 @@
     </script>
 </body>
 </html>
+
+
+```
