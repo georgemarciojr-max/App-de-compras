@@ -122,7 +122,6 @@
                         <button type="button" onclick="app.ui.modals.categorias.open()" class="text-sm text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1"><i class="ph ph-gear"></i> Categorias</button>
                     </div>
                 </div>
-                <!-- Lista Container (Os itens serão organizados por categoria aqui) -->
                 <div class="flex-1 overflow-y-auto p-4 pb-24 hide-scrollbar relative" id="lista-container"></div>
             </div>
 
@@ -162,7 +161,20 @@
 
     <!-- ================= MODAIS ================= -->
     
-    <!-- Modal Iniciar Viagem (Nome, Mercado, Orçamento) -->
+    <!-- Modal APENAS Nome (Para quem chega depois) -->
+    <div id="modal-nome" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl transition-colors duration-300">
+            <div class="text-center mb-6">
+                <div class="bg-emerald-100 dark:bg-emerald-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-emerald-600 dark:text-emerald-400 shadow-inner"><i class="ph-fill ph-identification-card text-3xl"></i></div>
+                <h3 class="text-2xl font-bold text-slate-800 dark:text-white">Quem é você?</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-2">Diga-nos o seu nome para sabermos quem marcou o quê.</p>
+            </div>
+            <input type="text" id="input-username-only" placeholder="O seu nome (Ex: Estela)" class="w-full px-4 py-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent dark:text-white font-bold outline-none focus:border-emerald-500 text-center mb-4 text-xl">
+            <button onclick="app.handlers.salvarNome()" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-md hover:bg-emerald-700 text-lg">Entrar</button>
+        </div>
+    </div>
+
+    <!-- Modal Iniciar Viagem (Mercado, Orçamento) - Para quem clica em Iniciar -->
     <div id="modal-iniciar" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl transition-colors duration-300">
             <div class="text-center mb-6">
@@ -171,10 +183,6 @@
             </div>
             
             <div class="space-y-4 mb-6">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">O seu Nome</label>
-                    <input type="text" id="input-username" placeholder="Ex: João" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white font-bold outline-none focus:border-emerald-500">
-                </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Primeiro Mercado</label>
                     <input type="text" id="input-primeiro-mercado" placeholder="Ex: Continente" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white font-bold outline-none focus:border-emerald-500">
@@ -189,8 +197,8 @@
             </div>
             
             <div class="flex gap-3">
-                <button onclick="app.ui.modals.iniciar.close()" id="btn-cancel-iniciar" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-4 rounded-xl font-bold hidden">Cancelar</button>
-                <button onclick="app.handlers.iniciarSessao()" class="flex-1 bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-md hover:bg-emerald-700">Arrancar</button>
+                <button onclick="app.ui.modals.iniciar.close()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-4 rounded-xl font-bold">Cancelar</button>
+                <button onclick="app.handlers.iniciarSessao()" class="flex-1 bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-md hover:bg-emerald-700">Iniciar</button>
             </div>
         </div>
     </div>
@@ -209,7 +217,7 @@
         </div>
     </div>
 
-    <!-- Modal Ações da Jornada (Substitui o antigo Fim Compras) -->
+    <!-- Modal Ações da Jornada -->
     <div id="modal-acoes-jornada" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl transition-colors duration-300">
             <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4 text-center">Direção da Viagem</h3>
@@ -261,23 +269,19 @@
         </div>
     </div>
     
-    <!-- (Modais de Categorias, Limpar Opcoes, Load Template e Confirm mantidos funcionais mas resumidos visualmente no código para poupar espaço) -->
-    <div id="modal-categorias" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-slate-800 dark:text-white">Categorias</h3><button onclick="app.ui.modals.categorias.close()" class="text-slate-400"><i class="ph ph-x text-xl"></i></button></div><div class="flex gap-2 mb-4"><input type="text" id="nova-categoria-nome" placeholder="Nova" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white"><button onclick="app.handlers.addCategoria()" class="bg-slate-800 dark:bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold"><i class="ph ph-plus text-lg"></i></button></div><div class="overflow-y-auto flex-1 hide-scrollbar bg-slate-50 dark:bg-slate-900 rounded-xl p-2"><ul id="lista-categorias-gerenciar" class="space-y-2"></ul></div></div></div>
+    <div id="modal-categorias" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-slate-800 dark:text-white">Categorias</h3><button onclick="app.ui.modals.categorias.close()" class="text-slate-400 hover:text-slate-600 bg-slate-100 dark:bg-slate-700 rounded-full p-1"><i class="ph ph-x text-xl"></i></button></div><div class="flex gap-2 mb-4"><input type="text" id="nova-categoria-nome" placeholder="Nova" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white"><button onclick="app.handlers.addCategoria()" class="bg-slate-800 dark:bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold"><i class="ph ph-plus text-lg"></i></button></div><div class="overflow-y-auto flex-1 hide-scrollbar bg-slate-50 dark:bg-slate-900 rounded-xl p-2"><ul id="lista-categorias-gerenciar" class="space-y-2"></ul></div></div></div>
     <div id="modal-limpar-opcoes" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><div class="bg-red-50 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500"><i class="ph ph-trash text-3xl"></i></div><h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Limpar Mercado</h3><div class="flex flex-col gap-3 mt-4"><button onclick="app.handlers.acaoLimparLista('desmarcar')" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-xl font-bold">Apenas Desmarcar</button><button onclick="app.handlers.acaoLimparLista('apagar')" class="w-full bg-red-500 text-white py-3 rounded-xl font-bold">Apagar Toda a Lista</button><button onclick="app.ui.modals.limpar.close()" class="w-full text-slate-400 py-2 font-bold mt-2">Cancelar</button></div></div></div>
     <div id="modal-load-template" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Carregar <span id="load-template-name" class="text-emerald-500"></span></h3><div class="flex flex-col gap-3 mt-6"><button onclick="app.handlers.executarLoadTemplate('substituir')" class="w-full bg-slate-900 dark:bg-emerald-600 text-white py-3 rounded-xl font-bold">Substituir Atual</button><button onclick="app.handlers.executarLoadTemplate('adicionar')" class="w-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 py-3 rounded-xl font-bold border border-emerald-200 dark:border-emerald-800">Apenas Adicionar Itens</button><button onclick="app.ui.modals.loadTemplate.close()" class="w-full text-slate-400 py-2 font-bold mt-2">Cancelar</button></div></div></div>
     <div id="modal-confirmacao" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 modal-backdrop"><div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><div id="confirm-icon-bg" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><i id="confirm-icon" class="text-3xl"></i></div><h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" id="confirm-title">Aviso</h3><p class="text-slate-600 dark:text-slate-400 text-sm mb-6" id="confirm-desc">Tem a certeza?</p><div class="flex gap-3"><button onclick="app.ui.modals.confirm.close()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-3 rounded-xl font-bold">Cancelar</button><button id="btn-confirm-action" class="flex-1 text-white py-3 rounded-xl font-bold shadow-md">Confirmar</button></div></div></div>
 
-    <!-- RELATÓRIO / VER DETALHES RECIBO -->
     <div id="modal-relatorio" class="fixed inset-0 bg-slate-900 z-[70] hidden flex flex-col p-4 overflow-y-auto">
         <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md mx-auto shadow-2xl my-auto relative overflow-hidden flex flex-col max-h-[90vh]">
             <i class="ph-fill ph-receipt text-[150px] text-slate-50 dark:text-slate-800/30 absolute -right-10 -bottom-10 pointer-events-none"></i>
             <div class="relative z-10 flex flex-col h-full overflow-hidden">
-                
                 <div class="text-center mb-6 flex-shrink-0">
                     <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-widest" id="rel-titulo-principal">Resumo da Viagem</h2>
                     <p id="rel-data-subtitulo" class="text-slate-500 dark:text-slate-400 text-sm mt-1"></p>
                 </div>
-
                 <div class="overflow-y-auto flex-1 hide-scrollbar pb-4 pr-1">
                     <div class="grid grid-cols-2 gap-3 mb-6">
                         <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800">
@@ -289,16 +293,11 @@
                             <p class="text-2xl font-black text-blue-800 dark:text-blue-300" id="rel-tempo">00:00</p>
                         </div>
                     </div>
-                    
                     <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2 text-sm"><i class="ph-fill ph-users text-emerald-500"></i> Quem gastou quanto?</h4>
                     <div id="rel-pessoas" class="space-y-3 mb-6"></div>
-
                     <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm border-b dark:border-slate-800 pb-1">Produtos por Mercado</h4>
-                    <div id="rel-mercados-container" class="space-y-4 mb-2">
-                        <!-- Gerado via JS agrupado por mercado -->
-                    </div>
+                    <div id="rel-mercados-container" class="space-y-4 mb-2"></div>
                 </div>
-
                 <div class="flex flex-col gap-3 flex-shrink-0 pt-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900" id="rel-botoes-container"></div>
             </div>
         </div>
@@ -331,8 +330,12 @@
                 init: () => { 
                     if(app.state.isDark) document.documentElement.classList.add('dark');
                     app.ui.renderThemeIcon();
-                    if (!app.state.currentUser) { app.handlers.iniciarComprasDialog(); } 
-                    else { document.getElementById('user-greeting').innerText = `Olá, ${app.state.currentUser}!`; }
+                    // Se não tiver nome, abre o modal de nome (NÃO o de iniciar viagem)
+                    if (!app.state.currentUser) { 
+                        app.ui.modals.nome.open(); 
+                    } else { 
+                        document.getElementById('user-greeting').innerText = `Olá, ${app.state.currentUser}!`; 
+                    }
                 },
                 toggleTheme: () => { const isDark = document.documentElement.classList.toggle('dark'); app.state.isDark = isDark; localStorage.setItem('mercado_theme', isDark ? 'dark' : 'light'); app.ui.renderThemeIcon(); },
                 renderThemeIcon: () => { const i = document.getElementById('icon-theme'); if(app.state.isDark) { i.className = "ph-fill ph-sun text-xl text-amber-300"; } else { i.className = "ph-fill ph-moon text-xl text-indigo-300"; } },
@@ -345,7 +348,8 @@
                 },
                 updateTimerUI: () => { if(app.state.session.ativa) document.getElementById('timer-display').innerText = app.utils.formatTime(Date.now() - app.state.session.inicio); },
                 modals: {
-                    iniciar: { open: () => { document.getElementById('input-username').value = app.state.currentUser || ''; document.getElementById('btn-cancel-iniciar').classList.toggle('hidden', !app.state.currentUser); document.getElementById('modal-iniciar').classList.remove('hidden'); }, close: () => document.getElementById('modal-iniciar').classList.add('hidden') },
+                    nome: { open: () => document.getElementById('modal-nome').classList.remove('hidden'), close: () => document.getElementById('modal-nome').classList.add('hidden') },
+                    iniciar: { open: () => document.getElementById('modal-iniciar').classList.remove('hidden'), close: () => document.getElementById('modal-iniciar').classList.add('hidden') },
                     mudarMercado: { open: () => { document.getElementById('input-novo-mercado').value=''; document.getElementById('modal-acoes-jornada').classList.add('hidden'); document.getElementById('modal-mudar-mercado').classList.remove('hidden'); setTimeout(()=>document.getElementById('input-novo-mercado').focus(),100); }, close: () => document.getElementById('modal-mudar-mercado').classList.add('hidden') },
                     acoesJornada: { open: () => document.getElementById('modal-acoes-jornada').classList.remove('hidden'), close: () => document.getElementById('modal-acoes-jornada').classList.add('hidden') },
                     preco: { open: (id, isEdit = false, pUnit = 0, qtd = 1) => { app.state.editingItemId = id; document.getElementById('input-preco-unit').value = pUnit > 0 ? pUnit : ''; document.getElementById('input-qtd').value = qtd > 0 ? qtd : 1; app.handlers.calcularTotalPrecoUI(); document.getElementById('modal-preco').classList.remove('hidden'); setTimeout(()=>document.getElementById('input-preco-unit').focus(),100); }, close: () => { app.state.editingItemId = null; document.getElementById('modal-preco').classList.add('hidden'); } },
@@ -377,12 +381,10 @@
                         if(grp[i.categoria])grp[i.categoria].push(i); else{if(!grp["Geral"])grp["Geral"]=[];grp["Geral"].push(i);} 
                     });
                     
-                    // UPDATE DISPLAYS
                     document.getElementById('subtotal-global-display').innerText = app.utils.formataMoeda(totalGlobal);
                     document.getElementById('subtotal-mercado-display').innerText = app.utils.formataMoeda(totalMercadoAtual);
                     document.getElementById('progress-text').innerText = `${comp}/${tot} Artigos`;
 
-                    // BUDGET GUARDIAN LOGIC
                     const orcamento = app.state.session.orcamento || 0;
                     const bBar = document.getElementById('budget-bar');
                     const bText = document.getElementById('budget-text');
@@ -392,7 +394,6 @@
                         const pct = Math.min((totalGlobal / orcamento) * 100, 100);
                         bBar.style.width = `${pct}%`;
                         bText.innerText = `${app.utils.formataMoeda(totalGlobal)} / ${app.utils.formataMoeda(orcamento)}`;
-                        
                         bBar.className = "h-full transition-all duration-500 ease-out relative " + (pct > 90 ? "bg-red-500 pulse-warning" : pct > 75 ? "bg-amber-400" : "bg-emerald-500");
                         headerGlow.className = "absolute top-0 right-0 w-40 h-40 rounded-full mix-blend-multiply filter blur-3xl pointer-events-none transition-colors duration-1000 " + (pct > 90 ? "bg-red-500 opacity-20" : pct > 75 ? "bg-amber-500 opacity-10" : "bg-emerald-500 opacity-10");
                     } else {
@@ -401,7 +402,6 @@
                         headerGlow.className = "absolute top-0 right-0 w-40 h-40 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 pointer-events-none";
                     }
 
-                    // RENDER LIST
                     for (const [cat, its] of Object.entries(grp)) {
                         if (its.length === 0) continue;
                         its.sort((a,b) => (a.comprado===b.comprado) ? a.nome.localeCompare(b.nome) : (a.comprado?1:-1));
@@ -409,7 +409,6 @@
                         its.forEach(i => {
                             const isCurrentMarket = i.mercadoComprado === mercadoAtivo;
                             const isPastMarket = i.comprado && !isCurrentMarket;
-                            
                             const qTx = (i.quantidade && i.quantidade > 1) ? `${i.quantidade}x ` : '';
                             const marketTag = isPastMarket ? `<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] px-1.5 py-0.5 rounded uppercase font-bold flex items-center gap-0.5"><i class="ph-fill ph-storefront"></i> ${i.mercadoComprado}</span>` : '';
 
@@ -437,18 +436,23 @@
                 }
             },
             handlers: {
+                // APENAS PARA QUEM ENTRA DE NOVO
+                salvarNome: () => { 
+                    const n = document.getElementById('input-username-only').value.trim(); 
+                    if(!n) return app.utils.showToast("Por favor, diga o seu nome.", "error"); 
+                    localStorage.setItem('mercado_username', n); 
+                    app.state.currentUser = n; 
+                    app.ui.modals.nome.close(); 
+                    document.getElementById('user-greeting').innerText = `Olá, ${n}!`; 
+                    app.utils.showToast(`Bem-vindo(a), ${n}!`);
+                },
+                
+                // PARA INICIAR A VIAGEM GLOBAL
                 iniciarComprasDialog: () => app.ui.modals.iniciar.open(),
                 iniciarSessao: async () => { 
-                    const nome = document.getElementById('input-username').value.trim();
                     const mercado = document.getElementById('input-primeiro-mercado').value.trim() || "Mercado Principal";
                     const orcInput = parseFloat(document.getElementById('input-orcamento').value.replace(',','.'));
                     const orcamento = !isNaN(orcInput) && orcInput > 0 ? orcInput : 0;
-                    
-                    if(!nome) return app.utils.showToast("Diga o seu nome primeiro", "error");
-                    
-                    localStorage.setItem('mercado_username', nome); app.state.currentUser = nome;
-                    document.getElementById('user-greeting').innerText = `Olá, ${nome}!`;
-
                     try { 
                         await setDoc(sessaoRef, {ativa:true, inicio:Date.now(), mercadoAtual: mercado, mercadosVisitados: [mercado], orcamento: orcamento}); 
                         app.ui.modals.iniciar.close();
@@ -509,12 +513,10 @@
                     document.getElementById('rel-titulo-principal').innerText = tit; document.getElementById('rel-data-subtitulo').innerText = isNovo ? "Resumo da Jornada de Hoje" : app.utils.formatDate(ts);
                     document.getElementById('rel-total').innerText = app.utils.formataMoeda(tot); document.getElementById('rel-tempo').innerText = tempo;
                     
-                    // Pessoas
                     const p = {}; itens.forEach(i => { const nm = i.quemPegou || 'Anónimo'; if(!p[nm]) p[nm] = { qtd: 0, gasto: 0 }; p[nm].qtd++; p[nm].gasto += i.preco; });
                     const divP = document.getElementById('rel-pessoas'); divP.innerHTML = '';
                     for (const [n, d] of Object.entries(p)) { divP.innerHTML += `<div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-white font-bold text-xs">${n.charAt(0).toUpperCase()}</div><div><p class="font-bold text-slate-700 dark:text-slate-200 text-sm">${n}</p><p class="text-xs text-slate-400">${d.qtd} artigos</p></div></div><span class="font-bold text-slate-800 dark:text-slate-100">${app.utils.formataMoeda(d.gasto)}</span></div>`; }
 
-                    // AGRUPAMENTO POR MERCADO
                     const mkts = {}; itens.forEach(i => { const m = i.mercadoComprado || 'Desconhecido'; if(!mkts[m]) mkts[m] = { total:0, lista:[] }; mkts[m].lista.push(i); mkts[m].total += i.preco; });
                     const contM = document.getElementById('rel-mercados-container'); contM.innerHTML = '';
                     for(const [mNome, mDados] of Object.entries(mkts)) {
@@ -523,15 +525,7 @@
                             const qTx = (i.quantidade && i.quantidade>1) ? `<span class="text-emerald-500 mr-1">${i.quantidade}x</span>` : '';
                             htmlLista += `<li class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"><div><p class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate w-40">${qTx}${i.nome}</p><p class="text-[10px] text-slate-400">${i.quemPegou || 'Anónimo'}</p></div><span class="font-bold text-slate-800 dark:text-white text-sm">${app.utils.formataMoeda(i.preco)}</span></li>`;
                         });
-                        contM.innerHTML += `
-                            <div class="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                                <div class="bg-slate-200 dark:bg-slate-900 px-3 py-2 flex justify-between items-center">
-                                    <h5 class="font-bold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-1"><i class="ph-fill ph-storefront text-blue-500"></i> ${mNome}</h5>
-                                    <span class="font-black text-sm text-slate-800 dark:text-white">${app.utils.formataMoeda(mDados.total)}</span>
-                                </div>
-                                <ul class="px-3">${htmlLista}</ul>
-                            </div>
-                        `;
+                        contM.innerHTML += `<div class="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden"><div class="bg-slate-200 dark:bg-slate-900 px-3 py-2 flex justify-between items-center"><h5 class="font-bold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-1"><i class="ph-fill ph-storefront text-blue-500"></i> ${mNome}</h5><span class="font-black text-sm text-slate-800 dark:text-white">${app.utils.formataMoeda(mDados.total)}</span></div><ul class="px-3">${htmlLista}</ul></div>`;
                     }
 
                     const bDiv = document.getElementById('rel-botoes-container');
@@ -557,6 +551,7 @@
         onSnapshot(itemsRef, (s) => { app.state.items = s.docs.map(d=>({id:d.id,...d.data()})); app.ui.renderItems(); });
         onSnapshot(query(listasSalvasRef, orderBy("timestamp", "desc")), (s) => { app.state.listasSalvas = s.docs.map(d=>({id:d.id,...d.data()})); app.ui.renderListasSalvas(); });
         onSnapshot(query(historicoRef, orderBy("data", "desc")), (s) => { app.state.historico = s.docs.map(d=>({id:d.id,...d.data()})); app.ui.renderHistorico(); });
+        
         onSnapshot(sessaoRef, (s) => {
             if(s.exists()){
                 const d = s.data(); app.state.session = d; 
